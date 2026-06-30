@@ -11,4 +11,5 @@ defmodule ExCedar.Native do
     version: version
 
   def cedar_version, do: :erlang.nif_error(:nif_not_loaded)
+  def policy_set_from_str(_text), do: :erlang.nif_error(:nif_not_loaded)
 end

@@ -16,6 +16,9 @@ erl_crash.dump
 # Compiled NIF artifacts (built locally or downloaded via rustler_precompiled)
 /priv/native/
 
+# ExUnit @tag :tmp_dir scratch directory
+/tmp/
+
 ### Elixir Patch ###
 
 ### Linux ###
