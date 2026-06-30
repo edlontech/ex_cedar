@@ -1,0 +1,12 @@
+[package]
+name = "ex_cedar_native"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "ex_cedar_native"
+crate-type = ["cdylib"]
+
+[dependencies]
+cedar-policy = "4.11"
+rustler = "0.38"
