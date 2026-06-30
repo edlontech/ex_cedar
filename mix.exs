@@ -6,7 +6,7 @@ defmodule ExCedar.MixProject do
   def project do
     [
       app: :ex_cedar,
-      version: "0.1.2",
+      version: "0.1.3",
       elixir: "~> 1.19",
       start_permanent: Mix.env() == :prod,
       description:
