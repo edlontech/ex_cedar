@@ -1,4 +1,6 @@
-use cedar_policy::{Authorizer, Context, Decision, Entities, EntityUid, PolicySet, Request};
+use cedar_policy::{
+    Authorizer, Context, Decision, Entities, EntityUid, PolicySet, Request, Schema,
+};
 use rustler::{Resource, ResourceArc};
 
 const CEDAR_VERSION: &str = env!("CEDAR_POLICY_VERSION");
@@ -12,6 +14,11 @@ pub struct EntitiesResource(pub Entities);
 
 #[rustler::resource_impl]
 impl Resource for EntitiesResource {}
+
+pub struct SchemaResource(pub Schema);
+
+#[rustler::resource_impl]
+impl Resource for SchemaResource {}
 
 #[derive(rustler::NifUnitEnum)]
 enum AuthzDecision {
@@ -86,6 +93,20 @@ fn authorize(
             .map(|e| e.to_string())
             .collect(),
     })
+}
+
+#[rustler::nif(schedule = "DirtyCpu")]
+fn schema_from_str(text: String) -> Result<ResourceArc<SchemaResource>, String> {
+    Schema::from_cedarschema_str(&text)
+        .map(|(schema, _warnings)| ResourceArc::new(SchemaResource(schema)))
+        .map_err(|e| e.to_string())
+}
+
+#[rustler::nif(schedule = "DirtyCpu")]
+fn schema_from_json(json: String) -> Result<ResourceArc<SchemaResource>, String> {
+    Schema::from_json_str(&json)
+        .map(|schema| ResourceArc::new(SchemaResource(schema)))
+        .map_err(|e| e.to_string())
 }
 
 rustler::init!("Elixir.ExCedar.Native");

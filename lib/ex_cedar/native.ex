@@ -24,4 +24,6 @@ defmodule ExCedar.Native do
   def policy_set_from_str(_text), do: :erlang.nif_error(:nif_not_loaded)
   def entities_from_json(_json), do: :erlang.nif_error(:nif_not_loaded)
   def authorize(_ps, _ents, _p, _a, _r, _ctx), do: :erlang.nif_error(:nif_not_loaded)
+  def schema_from_str(_text), do: :erlang.nif_error(:nif_not_loaded)
+  def schema_from_json(_json), do: :erlang.nif_error(:nif_not_loaded)
 end
