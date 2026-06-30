@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  MIX_ENV: test
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: "1.20.1"
+          otp-version: "29.0.1"
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache Elixir deps and build
+        uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+          key: elixir-${{ runner.os }}-otp29.0.1-ex1.20.1-${{ hashFiles('mix.lock') }}
+          restore-keys: |
+            elixir-${{ runner.os }}-otp29.0.1-ex1.20.1-
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            native/ex_cedar_native/target
+          key: cargo-${{ runner.os }}-${{ hashFiles('native/ex_cedar_native/Cargo.lock') }}
+          restore-keys: |
+            cargo-${{ runner.os }}-
+
+      - name: Install deps
+        run: mix deps.get
+
+      - name: Compile
+        run: mix compile --warnings-as-errors
+        env:
+          EX_CEDAR_BUILD: "1"
+
+      - name: Test
+        run: mix test
+
+      - name: Credo
+        run: mix credo
+
+      - name: Format check
+        run: mix format --check-formatted
+
+      - name: Dialyzer
+        run: mix dialyzer
+
+      - name: Cargo fmt
+        run: cargo fmt --check
+        working-directory: native/ex_cedar_native
+
+      - name: Cargo clippy
+        run: cargo clippy -- -D warnings
+        working-directory: native/ex_cedar_native

@@ -1,4 +1,6 @@
 defmodule ExCedar.Native do
+  @moduledoc false
+
   version = Mix.Project.config()[:version]
 
   use RustlerPrecompiled,
