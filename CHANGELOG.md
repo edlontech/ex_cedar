@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/edlontech/ex_cedar/compare/ex_cedar-v0.1.1...ex_cedar-v0.1.2) (2026-06-30)
+
+
+### Bug Fixes
+
+* Fixed MUSL builds ([f3410e2](https://github.com/edlontech/ex_cedar/commit/f3410e2ca6ca943e6800bdd2570a07afa40c6240))
+
 ## [0.1.1](https://github.com/edlontech/ex_cedar/compare/ex_cedar-v0.1.0...ex_cedar-v0.1.1) (2026-06-30)
 
 
