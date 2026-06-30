@@ -1,13 +1,12 @@
 defmodule ExCedar.MixProject do
   use Mix.Project
 
-  @source_url "https://github.com/edlon/ex_cedar"
-  @version "0.1.0"
+  @source_url "https://github.com/edlontech/ex_cedar"
 
   def project do
     [
       app: :ex_cedar,
-      version: @version,
+      version: "0.1.0",
       elixir: "~> 1.19",
       start_permanent: Mix.env() == :prod,
       description:

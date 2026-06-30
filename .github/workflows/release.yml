@@ -1,5 +1,6 @@
-# After release artifacts are published, generate and commit the checksum file:
-# mix rustler_precompiled.download ExCedar.Native --all --print > checksum-Elixir.ExCedar.Native.exs
+# Triggered by the vX.Y.Z tag that release-please creates when a release PR is merged.
+# Builds the precompiled NIFs for every target, uploads them to the GitHub release, then
+# generates the checksum file from those artifacts and publishes the package to Hex.
 name: Release
 
 on:
@@ -43,3 +44,27 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ steps.precompiled_job.outputs.file-path }}
+
+  publish_hex:
+    name: Publish to Hex
+    needs: build_release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: "1.20.1"
+          otp-version: "29.0.1"
+
+      - name: Install deps
+        run: mix deps.get
+
+      - name: Generate precompiled checksum file
+        run: mix rustler_precompiled.download ExCedar.Native --all
+
+      - name: Publish to Hex
+        run: mix hex.publish --yes
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
