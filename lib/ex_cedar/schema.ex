@@ -37,7 +37,7 @@ defmodule ExCedar.Schema do
   end
 
   def from_json(term) when is_map(term) do
-    json = term |> :json.encode() |> IO.iodata_to_binary()
+    json = JSON.encode!(term)
     wrap_nif(Native.schema_from_json(json))
   end
 

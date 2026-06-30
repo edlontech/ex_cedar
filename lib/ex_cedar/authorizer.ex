@@ -40,7 +40,7 @@ defmodule ExCedar.Authorizer do
       principal = EntityUid.to_string(req.principal)
       action = EntityUid.to_string(req.action)
       resource = EntityUid.to_string(req.resource)
-      context_json = req |> Request.context_json() |> IO.iodata_to_binary()
+      context_json = Request.context_json(req)
       schema = Keyword.get(opts, :schema)
 
       result =

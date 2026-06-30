@@ -25,9 +25,9 @@ defmodule ExCedar.Request do
         }
 
   @doc false
-  @spec context_json(t()) :: iodata()
+  @spec context_json(t()) :: binary()
   def context_json(%__MODULE__{context: context}) do
-    context |> encode_context() |> :json.encode()
+    context |> encode_context() |> JSON.encode!()
   end
 
   defp encode_context(%Context{} = ctx), do: Context.to_json(ctx)

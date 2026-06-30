@@ -20,8 +20,7 @@ defmodule ExCedar.Entities do
     json =
       entities
       |> Enum.map(&Entity.to_json/1)
-      |> :json.encode()
-      |> IO.iodata_to_binary()
+      |> JSON.encode!()
 
     call_nif(json)
   end
@@ -36,7 +35,7 @@ defmodule ExCedar.Entities do
   end
 
   def from_json(term) when is_list(term) or is_map(term) do
-    json = term |> :json.encode() |> IO.iodata_to_binary()
+    json = JSON.encode!(term)
     call_nif(json)
   end
 
