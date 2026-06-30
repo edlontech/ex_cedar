@@ -1,3 +1,6 @@
 [tools]
 elixir = "1.20.1-otp-29"
 erlang = "29.0.1"
+
+[env]
+EX_CEDAR_BUILD = "1"

@@ -11,6 +11,8 @@ env:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    env:
+      EX_CEDAR_BUILD: "1"
     steps:
       - uses: actions/checkout@v4
 
@@ -51,8 +53,6 @@ jobs:
 
       - name: Compile
         run: mix compile --warnings-as-errors
-        env:
-          EX_CEDAR_BUILD: "1"
 
       - name: Test
         run: mix test

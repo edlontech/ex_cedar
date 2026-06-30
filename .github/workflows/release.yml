@@ -1,0 +1,45 @@
+# After release artifacts are published, generate and commit the checksum file:
+# mix rustler_precompiled.download ExCedar.Native --all --print > checksum-Elixir.ExCedar.Native.exs
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  build_release:
+    name: Build ${{ matrix.job.target }} (NIF ${{ matrix.nif }})
+    runs-on: ${{ matrix.job.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        nif: ["2.15"]
+        job:
+          - {target: x86_64-unknown-linux-gnu,   os: ubuntu-22.04}
+          - {target: aarch64-unknown-linux-gnu,  os: ubuntu-22.04,   use-cross: true}
+          - {target: x86_64-unknown-linux-musl,  os: ubuntu-22.04,   use-cross: true}
+          - {target: aarch64-unknown-linux-musl, os: ubuntu-22.04,   use-cross: true}
+          - {target: x86_64-apple-darwin,        os: macos-13}
+          - {target: aarch64-apple-darwin,       os: macos-15}
+          - {target: x86_64-pc-windows-msvc,     os: windows-2022}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: philss/rustler-precompiled-action@v1.1.4
+        id: precompiled_job
+        with:
+          target: ${{ matrix.job.target }}
+          nif-version: ${{ matrix.nif }}
+          use-cross: ${{ matrix.job.use-cross || false }}
+          project-dir: "native/ex_cedar_native"
+
+      - name: Upload artifact to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.precompiled_job.outputs.file-path }}

@@ -1,12 +1,20 @@
 defmodule ExCedar.MixProject do
   use Mix.Project
 
+  @source_url "https://github.com/edlon/ex_cedar"
+  @version "0.1.0"
+
   def project do
     [
       app: :ex_cedar,
-      version: "0.1.0",
+      version: @version,
       elixir: "~> 1.19",
       start_permanent: Mix.env() == :prod,
+      description:
+        "Elixir bindings for the Cedar authorization policy engine via precompiled NIFs",
+      source_url: @source_url,
+      package: package(),
+      docs: docs(),
       deps: deps()
     ]
   end
@@ -15,6 +23,33 @@ defmodule ExCedar.MixProject do
   def application do
     [
       extra_applications: [:logger, :telemetry]
+    ]
+  end
+
+  defp package do
+    [
+      licenses: ["Apache-2.0"],
+      links: %{"GitHub" => @source_url},
+      files: [
+        "lib",
+        "native/ex_cedar_native/src",
+        "native/ex_cedar_native/Cargo.toml",
+        "native/ex_cedar_native/Cargo.lock",
+        "native/ex_cedar_native/build.rs",
+        "checksum-Elixir.ExCedar.Native.exs",
+        "mix.exs",
+        "mix.lock",
+        "README.md",
+        ".formatter.exs"
+      ]
+    ]
+  end
+
+  defp docs do
+    [
+      main: "ExCedar",
+      source_url: @source_url,
+      extras: ["README.md"]
     ]
   end
 
