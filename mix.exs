@@ -32,6 +32,7 @@ defmodule ExCedar.MixProject do
       files: [
         "lib",
         "native/ex_cedar_native/src",
+        "native/ex_cedar_native/.cargo",
         "native/ex_cedar_native/Cargo.toml",
         "native/ex_cedar_native/Cargo.lock",
         "native/ex_cedar_native/build.rs",
