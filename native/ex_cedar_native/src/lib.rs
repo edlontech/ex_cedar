@@ -1,5 +1,6 @@
 use cedar_policy::{
     Authorizer, Context, Decision, Entities, EntityUid, PolicySet, Request, Schema,
+    ValidationMode as CedarValidationMode, Validator,
 };
 use rustler::{Resource, ResourceArc};
 
@@ -24,6 +25,23 @@ impl Resource for SchemaResource {}
 enum AuthzDecision {
     Allow,
     Deny,
+}
+
+#[derive(rustler::NifUnitEnum)]
+enum ValidateMode {
+    Strict,
+}
+
+#[derive(rustler::NifMap)]
+struct Finding {
+    policy_id: String,
+    message: String,
+}
+
+#[derive(rustler::NifMap)]
+struct ValidateResult {
+    errors: Vec<Finding>,
+    warnings: Vec<Finding>,
 }
 
 #[derive(rustler::NifMap)]
@@ -107,6 +125,34 @@ fn schema_from_json(json: String) -> Result<ResourceArc<SchemaResource>, String>
     Schema::from_json_str(&json)
         .map(|schema| ResourceArc::new(SchemaResource(schema)))
         .map_err(|e| e.to_string())
+}
+
+#[rustler::nif(schedule = "DirtyCpu")]
+fn validate(
+    policy_set: ResourceArc<PolicySetResource>,
+    schema: ResourceArc<SchemaResource>,
+    mode: ValidateMode,
+) -> ValidateResult {
+    let cedar_mode = match mode {
+        ValidateMode::Strict => CedarValidationMode::Strict,
+    };
+    let result = Validator::new(schema.0.clone()).validate(&policy_set.0, cedar_mode);
+    ValidateResult {
+        errors: result
+            .validation_errors()
+            .map(|e| Finding {
+                policy_id: e.policy_id().to_string(),
+                message: e.to_string(),
+            })
+            .collect(),
+        warnings: result
+            .validation_warnings()
+            .map(|w| Finding {
+                policy_id: w.policy_id().to_string(),
+                message: w.to_string(),
+            })
+            .collect(),
+    }
 }
 
 rustler::init!("Elixir.ExCedar.Native");
