@@ -1,7 +1,7 @@
 defmodule ExCedar.CorpusTest do
   use ExUnit.Case, async: true
 
-  alias ExCedar.{Authorizer, Decision, Entities, EntityUid, PolicySet, Request}
+  alias ExCedar.{Authorizer, Decision, Entities, EntityUid, Error, PolicySet, Request, Schema}
 
   @fixtures_dir Path.expand("../fixtures/authz", __DIR__)
 
@@ -41,15 +41,31 @@ defmodule ExCedar.CorpusTest do
 
     {:ok, ps} = PolicySet.compile(policies)
     {:ok, ents} = Entities.from_json(entities)
-    {:ok, %Decision{} = decision} = Authorizer.authorize(ps, ents, request)
 
-    assert decision.decision == String.to_atom(expected["decision"])
+    opts =
+      case fixture["schema"] do
+        nil ->
+          []
 
-    assert MapSet.new(decision.determining_policies) ==
-             MapSet.new(expected["determining_policies"])
+        schema_text ->
+          {:ok, schema} = Schema.compile(schema_text)
+          [schema: schema]
+      end
 
-    if expected["has_errors"] do
-      assert decision.errors != []
+    result = Authorizer.authorize(ps, ents, request, opts)
+
+    if expected["error"] do
+      assert {:error, %Error.Invalid{}} = result
+    else
+      assert {:ok, %Decision{} = decision} = result
+      assert decision.decision == String.to_atom(expected["decision"])
+
+      assert MapSet.new(decision.determining_policies) ==
+               MapSet.new(expected["determining_policies"])
+
+      if expected["has_errors"] do
+        assert decision.errors != []
+      end
     end
   end
 end

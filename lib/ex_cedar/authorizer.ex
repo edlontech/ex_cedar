@@ -5,15 +5,24 @@ defmodule ExCedar.Authorizer do
 
   @spec authorize(term(), term(), Request.t(), keyword()) ::
           {:ok, Decision.t()} | {:error, term()}
-  def authorize(policy_set, entities, %Request{} = req, _opts \\ []) do
+  def authorize(policy_set, entities, %Request{} = req, opts \\ []) do
     :telemetry.span([:ex_cedar, :authorize], %{}, fn ->
       principal = EntityUid.to_string(req.principal)
       action = EntityUid.to_string(req.action)
       resource = EntityUid.to_string(req.resource)
       context_json = req |> Request.context_json() |> IO.iodata_to_binary()
+      schema = Keyword.get(opts, :schema)
 
       result =
-        case Native.authorize(policy_set, entities, principal, action, resource, context_json) do
+        case Native.authorize(
+               policy_set,
+               entities,
+               principal,
+               action,
+               resource,
+               context_json,
+               schema
+             ) do
           {:ok, raw} -> {:ok, struct(Decision, raw)}
           {:error, msg} -> {:error, Error.to_class([%Error.Request{message: msg}])}
         end

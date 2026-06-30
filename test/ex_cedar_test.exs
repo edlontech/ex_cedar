@@ -1,7 +1,7 @@
 defmodule ExCedarTest do
   use ExUnit.Case
 
-  alias ExCedar.{Decision, EntityUid, Request}
+  alias ExCedar.{Decision, EntityUid, Error, Request}
 
   @permit_policy """
   permit(principal == User::"alice", action == Action::"view", resource == Document::"doc1");
@@ -47,6 +47,40 @@ defmodule ExCedarTest do
 
       assert {:ok, %Decision{decision: :deny, errors: [_ | _]}} =
                ExCedar.authorize(policy, [alice], @request)
+    end
+  end
+
+  @schema_text """
+  entity User;
+  entity Document;
+  action "view" appliesTo {
+    principal: [User],
+    resource: [Document],
+    context: {}
+  };
+  """
+
+  describe "ExCedar.authorize/4 with schema:" do
+    test "valid request with schema returns Decision" do
+      assert {:ok, %Decision{decision: :allow}} =
+               ExCedar.authorize(@permit_policy, [], @request, schema: @schema_text)
+    end
+
+    test "invalid principal type with schema returns Invalid error" do
+      invalid_req = %Request{
+        principal: EntityUid.new("Group", "admins"),
+        action: EntityUid.new("Action", "view"),
+        resource: EntityUid.new("Document", "doc1"),
+        context: %{}
+      }
+
+      assert {:error, %Error.Invalid{}} =
+               ExCedar.authorize(@permit_policy, [], invalid_req, schema: @schema_text)
+    end
+
+    test "bad schema text returns error before authorizing" do
+      assert {:error, %Error.Invalid{}} =
+               ExCedar.authorize(@permit_policy, [], @request, schema: "not a schema")
     end
   end
 

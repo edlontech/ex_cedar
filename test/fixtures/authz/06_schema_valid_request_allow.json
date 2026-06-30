@@ -1,0 +1,20 @@
+{
+  "description": "schema-aware request: valid types allow",
+  "schema": "entity User;\nentity Document;\naction \"view\" appliesTo {\n  principal: [User],\n  resource: [Document],\n  context: {}\n};",
+  "policies": "permit(principal, action, resource);",
+  "entities": [
+    {"uid": {"type": "User", "id": "alice"}, "attrs": {}, "parents": []},
+    {"uid": {"type": "Document", "id": "doc1"}, "attrs": {}, "parents": []}
+  ],
+  "request": {
+    "principal": "User::\"alice\"",
+    "action": "Action::\"view\"",
+    "resource": "Document::\"doc1\"",
+    "context": {}
+  },
+  "expected": {
+    "decision": "allow",
+    "determining_policies": ["policy0"],
+    "has_errors": false
+  }
+}

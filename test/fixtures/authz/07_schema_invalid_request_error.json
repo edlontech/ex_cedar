@@ -1,0 +1,18 @@
+{
+  "description": "schema-aware request: undeclared principal type rejected",
+  "schema": "entity User;\nentity Document;\naction \"view\" appliesTo {\n  principal: [User],\n  resource: [Document],\n  context: {}\n};",
+  "policies": "permit(principal, action, resource);",
+  "entities": [
+    {"uid": {"type": "User", "id": "alice"}, "attrs": {}, "parents": []},
+    {"uid": {"type": "Document", "id": "doc1"}, "attrs": {}, "parents": []}
+  ],
+  "request": {
+    "principal": "Group::\"admins\"",
+    "action": "Action::\"view\"",
+    "resource": "Document::\"doc1\"",
+    "context": {}
+  },
+  "expected": {
+    "error": true
+  }
+}

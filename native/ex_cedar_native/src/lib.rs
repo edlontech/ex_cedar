@@ -79,6 +79,7 @@ fn authorize(
     action: String,
     resource: String,
     context_json: String,
+    schema: Option<ResourceArc<SchemaResource>>,
 ) -> Result<AuthzResult, String> {
     let principal: EntityUid = principal
         .parse()
@@ -90,8 +91,14 @@ fn authorize(
         .parse()
         .map_err(|e: cedar_policy::ParseErrors| e.to_string())?;
     let context = Context::from_json_str(&context_json, None).map_err(|e| e.to_string())?;
-    let request =
-        Request::new(principal, action, resource, context, None).map_err(|e| e.to_string())?;
+    let request = Request::new(
+        principal,
+        action,
+        resource,
+        context,
+        schema.as_ref().map(|s| &s.0),
+    )
+    .map_err(|e| e.to_string())?;
 
     let response = Authorizer::new().is_authorized(&request, &policy_set.0, &entities.0);
 
