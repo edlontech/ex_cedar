@@ -12,19 +12,9 @@ defmodule ExCedar.Request do
           context: Context.t() | map()
         }
 
-  @spec to_parts(t()) :: {map(), map(), map(), map()}
-  def to_parts(%__MODULE__{
-        principal: principal,
-        action: action,
-        resource: resource,
-        context: context
-      }) do
-    {
-      EntityUid.to_json(principal),
-      EntityUid.to_json(action),
-      EntityUid.to_json(resource),
-      encode_context(context)
-    }
+  @spec context_json(t()) :: iodata()
+  def context_json(%__MODULE__{context: context}) do
+    context |> encode_context() |> :json.encode()
   end
 
   defp encode_context(%Context{} = ctx), do: Context.to_json(ctx)

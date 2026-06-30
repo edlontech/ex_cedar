@@ -1,4 +1,4 @@
-use cedar_policy::{Entities, PolicySet};
+use cedar_policy::{Authorizer, Context, Decision, Entities, EntityUid, PolicySet, Request};
 use rustler::{Resource, ResourceArc};
 
 const CEDAR_VERSION: &str = env!("CEDAR_POLICY_VERSION");
@@ -12,6 +12,19 @@ pub struct EntitiesResource(pub Entities);
 
 #[rustler::resource_impl]
 impl Resource for EntitiesResource {}
+
+#[derive(rustler::NifUnitEnum)]
+enum AuthzDecision {
+    Allow,
+    Deny,
+}
+
+#[derive(rustler::NifMap)]
+struct AuthzResult {
+    decision: AuthzDecision,
+    determining_policies: Vec<String>,
+    errors: Vec<String>,
+}
 
 #[rustler::nif]
 fn cedar_version() -> &'static str {
@@ -31,6 +44,48 @@ fn entities_from_json(json: String) -> Result<ResourceArc<EntitiesResource>, Str
     Entities::from_json_str(&json, None)
         .map(|e| ResourceArc::new(EntitiesResource(e)))
         .map_err(|e| e.to_string())
+}
+
+#[rustler::nif(schedule = "DirtyCpu")]
+fn authorize(
+    policy_set: ResourceArc<PolicySetResource>,
+    entities: ResourceArc<EntitiesResource>,
+    principal: String,
+    action: String,
+    resource: String,
+    context_json: String,
+) -> Result<AuthzResult, String> {
+    let principal: EntityUid = principal
+        .parse()
+        .map_err(|e: cedar_policy::ParseErrors| e.to_string())?;
+    let action: EntityUid = action
+        .parse()
+        .map_err(|e: cedar_policy::ParseErrors| e.to_string())?;
+    let resource: EntityUid = resource
+        .parse()
+        .map_err(|e: cedar_policy::ParseErrors| e.to_string())?;
+    let context = Context::from_json_str(&context_json, None).map_err(|e| e.to_string())?;
+    let request =
+        Request::new(principal, action, resource, context, None).map_err(|e| e.to_string())?;
+
+    let response = Authorizer::new().is_authorized(&request, &policy_set.0, &entities.0);
+
+    Ok(AuthzResult {
+        decision: match response.decision() {
+            Decision::Allow => AuthzDecision::Allow,
+            Decision::Deny => AuthzDecision::Deny,
+        },
+        determining_policies: response
+            .diagnostics()
+            .reason()
+            .map(|id| id.to_string())
+            .collect(),
+        errors: response
+            .diagnostics()
+            .errors()
+            .map(|e| e.to_string())
+            .collect(),
+    })
 }
 
 rustler::init!("Elixir.ExCedar.Native");
