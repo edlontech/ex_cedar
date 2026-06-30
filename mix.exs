@@ -22,6 +22,7 @@ defmodule ExCedar.MixProject do
   defp deps do
     [
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:splode, "~> 0.3"},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:doctor, "~> 0.22", only: :dev},
       {:ex_check, "~> 0.16", only: [:dev, :test], runtime: false},
