@@ -4,10 +4,15 @@ defmodule ExCedar.PolicySet do
   alias ExCedar.{Error, Native}
 
   def compile(text) when is_binary(text) do
-    with {:error, messages} <- Native.policy_set_from_str(text) do
-      entries = Enum.map(messages, &%{message: &1, span: nil})
-      {:error, Error.to_class([%Error.Parse{errors: entries}])}
-    end
+    :telemetry.span([:ex_cedar, :compile], %{}, fn ->
+      result =
+        with {:error, messages} <- Native.policy_set_from_str(text) do
+          entries = Enum.map(messages, &%{message: &1, span: nil})
+          {:error, Error.to_class([%Error.Parse{errors: entries}])}
+        end
+
+      {result, %{}}
+    end)
   end
 
   def compile!(text) do
