@@ -27,4 +27,10 @@ defmodule ExCedar.Native do
   def schema_from_str(_text), do: :erlang.nif_error(:nif_not_loaded)
   def schema_from_json(_json), do: :erlang.nif_error(:nif_not_loaded)
   def validate(_ps, _schema, _mode), do: :erlang.nif_error(:nif_not_loaded)
+
+  def policy_set_link_template(_ps, _tmpl_id, _new_id, _principal, _resource),
+    do: :erlang.nif_error(:nif_not_loaded)
+
+  def policy_set_policy_ids(_ps), do: :erlang.nif_error(:nif_not_loaded)
+  def policy_set_template_ids(_ps), do: :erlang.nif_error(:nif_not_loaded)
 end

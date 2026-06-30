@@ -1,8 +1,9 @@
 use cedar_policy::{
-    Authorizer, Context, Decision, Entities, EntityUid, PolicySet, Request, Schema,
-    ValidationMode as CedarValidationMode, Validator,
+    Authorizer, Context, Decision, Entities, EntityUid, PolicyId, PolicySet, Request, Schema,
+    SlotId, ValidationMode as CedarValidationMode, Validator,
 };
 use rustler::{Resource, ResourceArc};
+use std::collections::HashMap;
 
 const CEDAR_VERSION: &str = env!("CEDAR_POLICY_VERSION");
 
@@ -160,6 +161,55 @@ fn validate(
             })
             .collect(),
     }
+}
+
+#[rustler::nif(schedule = "DirtyCpu")]
+fn policy_set_link_template(
+    policy_set: ResourceArc<PolicySetResource>,
+    template_id: String,
+    new_id: String,
+    principal: Option<String>,
+    resource: Option<String>,
+) -> Result<ResourceArc<PolicySetResource>, String> {
+    let mut cloned = policy_set.0.clone();
+
+    let mut vals: HashMap<SlotId, EntityUid> = HashMap::new();
+    if let Some(p) = principal {
+        let uid: EntityUid = p
+            .parse()
+            .map_err(|e: cedar_policy::ParseErrors| e.to_string())?;
+        vals.insert(SlotId::principal(), uid);
+    }
+    if let Some(r) = resource {
+        let uid: EntityUid = r
+            .parse()
+            .map_err(|e: cedar_policy::ParseErrors| e.to_string())?;
+        vals.insert(SlotId::resource(), uid);
+    }
+
+    cloned
+        .link(PolicyId::new(template_id), PolicyId::new(new_id), vals)
+        .map_err(|e| e.to_string())?;
+
+    Ok(ResourceArc::new(PolicySetResource(cloned)))
+}
+
+#[rustler::nif]
+fn policy_set_policy_ids(policy_set: ResourceArc<PolicySetResource>) -> Vec<String> {
+    policy_set
+        .0
+        .policies()
+        .map(|p| p.id().to_string())
+        .collect()
+}
+
+#[rustler::nif]
+fn policy_set_template_ids(policy_set: ResourceArc<PolicySetResource>) -> Vec<String> {
+    policy_set
+        .0
+        .templates()
+        .map(|t| t.id().to_string())
+        .collect()
 }
 
 rustler::init!("Elixir.ExCedar.Native");
