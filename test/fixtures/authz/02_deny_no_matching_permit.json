@@ -1,0 +1,19 @@
+{
+  "description": "non-matching principal yields deny with no determining policies",
+  "policies": "permit(principal == User::\"alice\", action == Action::\"view\", resource == Document::\"doc1\");",
+  "entities": [
+    {"uid": {"type": "User", "id": "bob"}, "attrs": {}, "parents": []},
+    {"uid": {"type": "Document", "id": "doc1"}, "attrs": {}, "parents": []}
+  ],
+  "request": {
+    "principal": "User::\"bob\"",
+    "action": "Action::\"view\"",
+    "resource": "Document::\"doc1\"",
+    "context": {}
+  },
+  "expected": {
+    "decision": "deny",
+    "determining_policies": [],
+    "has_errors": false
+  }
+}

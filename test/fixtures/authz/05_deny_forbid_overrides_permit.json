@@ -1,0 +1,19 @@
+{
+  "description": "forbid overriding a matching permit yields deny",
+  "policies": "permit(principal == User::\"alice\", action == Action::\"view\", resource == Document::\"doc1\");\nforbid(principal == User::\"alice\", action == Action::\"view\", resource == Document::\"doc1\");",
+  "entities": [
+    {"uid": {"type": "User", "id": "alice"}, "attrs": {}, "parents": []},
+    {"uid": {"type": "Document", "id": "doc1"}, "attrs": {}, "parents": []}
+  ],
+  "request": {
+    "principal": "User::\"alice\"",
+    "action": "Action::\"view\"",
+    "resource": "Document::\"doc1\"",
+    "context": {}
+  },
+  "expected": {
+    "decision": "deny",
+    "determining_policies": ["policy1"],
+    "has_errors": false
+  }
+}

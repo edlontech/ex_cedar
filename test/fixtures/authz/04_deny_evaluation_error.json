@@ -1,0 +1,18 @@
+{
+  "description": "policy evaluation error on missing attribute yields deny with errors",
+  "policies": "permit(principal, action, resource) when { principal.missing == 1 };",
+  "entities": [
+    {"uid": {"type": "User", "id": "alice"}, "attrs": {}, "parents": []}
+  ],
+  "request": {
+    "principal": "User::\"alice\"",
+    "action": "Action::\"view\"",
+    "resource": "Document::\"doc1\"",
+    "context": {}
+  },
+  "expected": {
+    "decision": "deny",
+    "determining_policies": [],
+    "has_errors": true
+  }
+}
