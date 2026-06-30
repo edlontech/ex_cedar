@@ -1,6 +1,8 @@
 defmodule ExCedarTest do
   use ExUnit.Case
 
+  doctest ExCedar
+
   alias ExCedar.{Decision, EntityUid, Error, Request}
 
   @permit_policy """

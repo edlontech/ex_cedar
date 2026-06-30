@@ -1,5 +1,17 @@
 defmodule ExCedar.Request do
-  @moduledoc false
+  @moduledoc """
+  Cedar authorization request.
+
+  Groups `principal`, `action`, and `resource` as `ExCedar.EntityUid` structs
+  and an optional `context` as a plain map or `ExCedar.Context` struct.
+
+      %ExCedar.Request{
+        principal: ExCedar.EntityUid.new("User", "alice"),
+        action:    ExCedar.EntityUid.new("Action", "view"),
+        resource:  ExCedar.EntityUid.new("Document", "doc1"),
+        context:   %{"mfa" => true}
+      }
+  """
 
   alias ExCedar.{Context, EntityUid, Value}
 
@@ -12,6 +24,7 @@ defmodule ExCedar.Request do
           context: Context.t() | map()
         }
 
+  @doc false
   @spec context_json(t()) :: iodata()
   def context_json(%__MODULE__{context: context}) do
     context |> encode_context() |> :json.encode()

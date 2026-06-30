@@ -49,7 +49,22 @@ defmodule ExCedar.MixProject do
     [
       main: "ExCedar",
       source_url: @source_url,
-      extras: ["README.md"]
+      extras: ["README.md"],
+      groups_for_modules: [
+        Artifacts: [ExCedar.PolicySet, ExCedar.Schema, ExCedar.Entities],
+        Requests: [
+          ExCedar.EntityUid,
+          ExCedar.Entity,
+          ExCedar.Request,
+          ExCedar.Context,
+          ExCedar.Decimal,
+          ExCedar.IpAddr
+        ],
+        Operations: [ExCedar.Authorizer, ExCedar.Validator],
+        Results: [ExCedar.Decision, ExCedar.ValidationResult],
+        Errors: [ExCedar.Error],
+        Telemetry: [ExCedar.Telemetry]
+      ]
     ]
   end
 

@@ -2,9 +2,9 @@ defmodule ExCedar do
   @moduledoc """
   Cedar policy engine bindings for Elixir.
 
-  One-shot convenience: compile inputs and evaluate authorization in a single call.
-  Use `ExCedar.PolicySet`, `ExCedar.Entities`, and `ExCedar.Authorizer` directly
-  when you need to reuse compiled handles across multiple requests.
+  One-shot convenience: compile inputs and evaluate authorization in a single
+  call. Use `ExCedar.PolicySet`, `ExCedar.Entities`, and `ExCedar.Authorizer`
+  directly when you need to reuse compiled handles across multiple requests.
 
   ## Example
 
@@ -15,12 +15,24 @@ defmodule ExCedar do
       ...>   resource: ExCedar.EntityUid.new("Document", "doc1"),
       ...>   context: %{}
       ...> }
-      iex> {:ok, %ExCedar.Decision{decision: :allow}} = ExCedar.authorize(policy, [], request)
+      iex> {:ok, dec} = ExCedar.authorize(policy, [], request)
+      iex> dec.decision
+      :allow
 
   """
 
   alias ExCedar.{Authorizer, Decision, Entities, PolicySet, Request, Schema}
 
+  @doc """
+  Compiles `policy_text` and `entities` on the fly and runs authorization.
+
+  Options:
+  - `:schema` — Cedar schema text or a compiled `ExCedar.Schema` handle.
+    When supplied, the request is validated against the schema before evaluation.
+
+  Prefer `ExCedar.Authorizer.authorize/4` with pre-compiled handles on hot
+  paths to avoid recompiling on every call.
+  """
   @spec authorize(String.t(), list(), Request.t(), keyword()) ::
           {:ok, Decision.t()} | {:error, term()}
   def authorize(policy_text, entities, %Request{} = request, opts \\ []) do

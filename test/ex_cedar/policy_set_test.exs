@@ -1,6 +1,8 @@
 defmodule ExCedar.PolicySetTest do
   use ExUnit.Case, async: true
 
+  doctest ExCedar.PolicySet
+
   alias ExCedar.PolicySet
 
   @valid_policy "permit(principal, action, resource);"

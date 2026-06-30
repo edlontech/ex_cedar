@@ -1,9 +1,32 @@
 defmodule ExCedar.Validator do
-  @moduledoc false
+  @moduledoc """
+  Schema-based policy validation over compiled handles.
+
+  Validates that every policy in a `PolicySet` is consistent with the given
+  `Schema`. Findings (errors and warnings) are returned as plain data in a
+  `ValidationResult` struct — they are not raised as exceptions.
+
+  Only `:strict` validation mode is supported. Cedar's `:permissive` mode
+  is experimental and not enabled.
+  """
 
   alias ExCedar.{Error, Native, ValidationResult}
   alias ExCedar.ValidationResult.Finding
 
+  @doc """
+  Validates `policy_set` against `schema` and returns a `ValidationResult`.
+
+  Options:
+  - `:mode` — validation mode; only `:strict` is supported (default: `:strict`).
+
+  Returns `{:ok, %ExCedar.ValidationResult{}}` on a successful call. Check
+  `validated?` and the `errors`/`warnings` lists for findings.
+
+  Returns `{:error, %ExCedar.Error.Invalid{}}` only for operational failures
+  (e.g. non-reference handles passed as arguments), not for validation findings.
+
+  Raises `ArgumentError` if an unsupported `mode` is given.
+  """
   def validate(policy_set, schema, opts \\ [])
 
   def validate(policy_set, schema, opts)

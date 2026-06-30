@@ -2,6 +2,8 @@ defmodule ExCedar.EntityUidTest do
   use ExUnit.Case, async: true
   use ExUnitProperties
 
+  doctest ExCedar.EntityUid
+
   alias ExCedar.EntityUid
 
   describe "new/2" do
