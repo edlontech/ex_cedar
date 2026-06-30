@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/edlontech/ex_cedar/compare/ex_cedar-v0.1.2...ex_cedar-v0.1.3) (2026-06-30)
+
+
+### Bug Fixes
+
+* Fixes the base_url for rustler ([b2e42eb](https://github.com/edlontech/ex_cedar/commit/b2e42eb14c1b7a5c824ccacbdef19258651a70eb))
+
 ## [0.1.2](https://github.com/edlontech/ex_cedar/compare/ex_cedar-v0.1.1...ex_cedar-v0.1.2) (2026-06-30)
 
 
