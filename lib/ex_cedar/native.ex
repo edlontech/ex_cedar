@@ -6,7 +6,7 @@ defmodule ExCedar.Native do
   use RustlerPrecompiled,
     otp_app: :ex_cedar,
     crate: "ex_cedar_native",
-    base_url: "https://github.com/edlontech/ex_cedar/releases/download/v#{version}",
+    base_url: "https://github.com/edlontech/ex_cedar/releases/download/ex_cedar-v#{version}",
     force_build: System.get_env("EX_CEDAR_BUILD") in ["1", "true"],
     version: version,
     targets: ~w(
