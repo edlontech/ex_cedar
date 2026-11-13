@@ -8,5 +8,5 @@ name = "ex_cedar_native"
 crate-type = ["cdylib"]
 
 [dependencies]
-cedar-policy = "4.11"
-rustler = "0.38"
+cedar-policy = "4.14"
+rustler = "0.39"
